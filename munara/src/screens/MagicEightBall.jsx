@@ -160,7 +160,7 @@ export default function MagicEightBall() {
                     fontFamily: "'Pacifico', cursive"
                 }}
             >
-                Ask a question about us...
+                Ask a question about everything you want :)
             </motion.p>
 
             {/* The Magic Ball */}

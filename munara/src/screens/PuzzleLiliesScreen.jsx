@@ -10,6 +10,7 @@ export default function PuzzleLiliesScreen() {
     const [completedPieces, setCompletedPieces] = useState([])
     const [showSuccess, setShowSuccess] = useState(false)
     const [hintVisible, setHintVisible] = useState(false)
+    const [selectedPiece, setSelectedPiece] = useState(null) // For touch support
 
     const GRID_SIZE = 3 // 3x3 puzzle
     const PIECE_SIZE = 120
@@ -78,21 +79,68 @@ export default function PuzzleLiliesScreen() {
         }
     }
 
+    // Touch-friendly: Click to select, click to place
+    const handlePieceClick = (piece) => {
+        setSelectedPiece(piece)
+    }
+
+    const handleSlotClick = (row, col) => {
+        if (!selectedPiece) return
+
+        // Check if spot is already taken
+        const spotTaken = pieces.some(p => p.currentRow === row && p.currentCol === col && p.id !== selectedPiece.id)
+        if (spotTaken) return
+
+        // Place piece
+        const newPieces = pieces.map(p => {
+            if (p.id === selectedPiece.id) {
+                return { ...p, currentRow: row, currentCol: col }
+            }
+            return p
+        })
+
+        setPieces(newPieces)
+        setSelectedPiece(null)
+
+        // Check if piece is correct
+        if (selectedPiece.correctRow === row && selectedPiece.correctCol === col) {
+            setCompletedPieces(prev => [...prev, selectedPiece.id])
+        }
+
+        // Check if puzzle is complete
+        const allCorrect = newPieces.every(p =>
+            p.currentRow === p.correctRow && p.currentCol === p.correctCol
+        )
+
+        if (allCorrect) {
+            setShowSuccess(true)
+            setTimeout(() => {
+                completeCard(CARDS.PUZZLE)
+                window.location.href = '/hub'
+            }, 3000)
+        }
+    }
+
     const getPieceStyle = (piece) => {
+        const isSelected = selectedPiece?.id === piece.id
         return {
             backgroundImage: 'url(/lily-bouquet.png)',
             backgroundSize: `${PIECE_SIZE * GRID_SIZE}px ${PIECE_SIZE * GRID_SIZE}px`,
             backgroundPosition: `-${piece.correctCol * PIECE_SIZE}px -${piece.correctRow * PIECE_SIZE}px`,
             width: `${PIECE_SIZE}px`,
             height: `${PIECE_SIZE}px`,
-            border: completedPieces.includes(piece.id)
-                ? '3px solid #4ade80'
-                : '3px solid rgba(255, 255, 255, 0.5)',
+            border: isSelected
+                ? '3px solid #3b82f6'
+                : completedPieces.includes(piece.id)
+                    ? '3px solid #4ade80'
+                    : '3px solid rgba(255, 255, 255, 0.5)',
             borderRadius: '12px',
-            cursor: 'grab',
-            boxShadow: completedPieces.includes(piece.id)
-                ? '0 0 20px rgba(74, 222, 128, 0.5)'
-                : '0 4px 15px rgba(0, 0, 0, 0.2)'
+            cursor: 'pointer',
+            boxShadow: isSelected
+                ? '0 0 20px rgba(59, 130, 246, 0.8)'
+                : completedPieces.includes(piece.id)
+                    ? '0 0 20px rgba(74, 222, 128, 0.5)'
+                    : '0 4px 15px rgba(0, 0, 0, 0.2)'
         }
     }
 
@@ -233,7 +281,7 @@ export default function PuzzleLiliesScreen() {
                 textAlign: 'center',
                 textShadow: '2px 2px 4px rgba(255, 77, 122, 0.4)'
             }}>
-                Перетащи кусочки на нужные места
+                Перетащи или нажми на кусочки, затем нажми на место
             </p>
 
             {/* Hint button */}
@@ -306,19 +354,25 @@ export default function PuzzleLiliesScreen() {
                                     key={idx}
                                     onDragOver={(e) => e.preventDefault()}
                                     onDrop={() => handleDrop(row, col)}
+                                    onClick={() => handleSlotClick(row, col)}
                                     style={{
                                         width: `${PIECE_SIZE}px`,
                                         height: `${PIECE_SIZE}px`,
                                         background: placedPiece ? 'transparent' : 'rgba(255, 255, 255, 0.2)',
                                         border: '3px dashed rgba(255, 255, 255, 0.4)',
                                         borderRadius: '12px',
-                                        position: 'relative'
+                                        position: 'relative',
+                                        cursor: selectedPiece ? 'pointer' : 'default'
                                     }}
                                 >
                                     {placedPiece && (
                                         <div
                                             draggable
                                             onDragStart={() => handleDragStart(placedPiece)}
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                handlePieceClick(placedPiece)
+                                            }}
                                             style={getPieceStyle(placedPiece)}
                                         />
                                     )}
@@ -364,6 +418,7 @@ export default function PuzzleLiliesScreen() {
                                 key={piece.id}
                                 draggable
                                 onDragStart={() => handleDragStart(piece)}
+                                onClick={() => handlePieceClick(piece)}
                                 whileHover={{ scale: 1.05, rotate: 2 }}
                                 whileTap={{ scale: 0.95 }}
                                 style={getPieceStyle(piece)}

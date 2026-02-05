@@ -424,21 +424,6 @@ export default function PragueTravelScreen() {
                             width: '100%'
                         }}
                     >
-                        <motion.div
-                            animate={{
-                                x: ['-100%', '100%']
-                            }}
-                            transition={{ duration: 2, ease: 'easeInOut' }}
-                            style={{
-                                fontSize: '8rem',
-                                position: 'absolute',
-                                top: '50%',
-                                transform: 'translateY(-50%)'
-                            }}
-                        >
-                            🚶‍♀️
-                        </motion.div>
-
                         <h2 style={{
                             fontSize: '3rem',
                             fontFamily: "'Pacifico', cursive",

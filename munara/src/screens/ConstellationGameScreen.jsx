@@ -430,7 +430,7 @@ export default function ConstellationGameScreen() {
                             textShadow: '0 0 15px rgba(255, 215, 0, 0.6), 1px 1px 5px rgba(0,0,0,0.8)'
                         }}
                     >
-                        The stars aligned just for you 💫
+                        Красиво да? 💫
                     </motion.p>
 
                     <p

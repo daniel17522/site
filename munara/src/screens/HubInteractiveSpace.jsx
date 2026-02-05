@@ -266,7 +266,17 @@ export default function HubInteractiveSpace() {
     const [celebrationCard, setCelebrationCard] = useState(null)
     const [currentQuote, setCurrentQuote] = useState(0)
     const [flippedPhoto, setFlippedPhoto] = useState(null)
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
     const allCompleted = areAllCardsCompleted()
+
+    // Handle window resize for responsive design
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768)
+        }
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
 
     useEffect(() => {
         const count = SYMBOLS.filter(s => isCardCompleted(s.id)).length
@@ -312,7 +322,7 @@ export default function HubInteractiveSpace() {
                 minHeight: '100vh',
                 width: '100%',
                 position: 'relative',
-                overflow: 'hidden',
+                overflow: 'auto',
                 background: 'linear-gradient(135deg, #ffb6c1 0%, #ff9ec5 25%, #ff8fa8 50%, #ffb6c1 100%)'
             }}
         >
@@ -362,7 +372,7 @@ export default function HubInteractiveSpace() {
                     textAlign: 'center',
                     paddingTop: 'clamp(2rem, 5vh, 3rem)',
                     position: 'relative',
-                    zIndex: 10
+                    zIndex: 100
                 }}
             >
                 <h1 style={{
@@ -398,7 +408,13 @@ export default function HubInteractiveSpace() {
 
             {/* Interactive Polaroid Photos */}
             {[0, 1, 2, 3, 4].map((index) => {
-                const positions = [
+                const positions = isMobile ? [
+                    { top: '12%', left: '2%', rotate: -8 },
+                    { top: '12%', right: '2%', rotate: 6, left: 'auto' },
+                    { bottom: '25%', left: '2%', rotate: -7 },
+                    { top: '35%', right: '2%', rotate: -5, left: 'auto' },
+                    { bottom: '25%', right: '2%', rotate: 8, left: 'auto' }
+                ] : [
                     { top: '12%', left: '2%', rotate: -8 },
                     { top: '15%', right: '3%', rotate: 6, left: 'auto' },
                     { bottom: '8%', left: '3%', rotate: -7 },
@@ -423,15 +439,17 @@ export default function HubInteractiveSpace() {
                         style={{
                             position: 'absolute',
                             ...positions[index],
-                            width: '180px',
+                            width: isMobile ? '130px' : '180px',
                             background: 'white',
-                            padding: '12px',
-                            paddingBottom: '35px',
+                            padding: isMobile ? '8px' : '12px',
+                            paddingBottom: isMobile ? '25px' : '35px',
                             borderRadius: '8px',
                             boxShadow: '0 8px 25px rgba(0, 0, 0, 0.25), 4px 4px 0px rgba(255, 77, 122, 0.3)',
                             cursor: 'pointer',
-                            zIndex: flippedPhoto === index ? 60 : 5,
-                            perspective: '1000px'
+                            zIndex: flippedPhoto === index ? 60 : 4,
+                            perspective: '1000px',
+                            touchAction: 'manipulation',
+                            WebkitTapHighlightColor: 'transparent'
                         }}
                     >
                         <AnimatePresence mode="wait">
@@ -450,13 +468,13 @@ export default function HubInteractiveSpace() {
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        padding: '1rem',
+                                        padding: isMobile ? '0.5rem' : '1rem',
                                         textAlign: 'center'
                                     }}
                                 >
                                     <p style={{
                                         color: 'white',
-                                        fontSize: 'clamp(0.7rem, 1.5vw, 0.9rem)',
+                                        fontSize: isMobile ? '0.65rem' : 'clamp(0.8rem, 1.5vw, 0.9rem)',
                                         fontFamily: "'Pacifico', cursive",
                                         lineHeight: 1.4
                                     }}>
@@ -525,14 +543,15 @@ export default function HubInteractiveSpace() {
                     whileHover={{ scale: 1.1, rotate: 0, y: -15 }}
                     onClick={() => navigate('/letter')}
                     style={{
-                        position: 'absolute',
-                        left: '15%',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        width: 'clamp(140px, 16vw, 190px)',
+                        position: isMobile ? 'fixed' : 'absolute',
+                        left: isMobile ? '50%' : '15%',
+                        top: isMobile ? 'auto' : '50%',
+                        bottom: isMobile ? '20px' : 'auto',
+                        transform: isMobile ? 'translateX(-50%)' : 'translateY(-50%)',
+                        width: isMobile ? '110px' : 'clamp(140px, 16vw, 190px)',
                         background: 'white',
-                        padding: '15px',
-                        paddingBottom: '30px',
+                        padding: isMobile ? '10px' : '15px',
+                        paddingBottom: isMobile ? '25px' : '30px',
                         borderRadius: '10px',
                         boxShadow: '0 8px 25px rgba(255, 77, 122, 0.4), 0 0 0 3px #ff4d7a',
                         cursor: 'pointer',
@@ -595,17 +614,17 @@ export default function HubInteractiveSpace() {
             {/* Centered Grid of Activity Cards */}
             <div
                 style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
+                    position: 'relative',
                     display: 'flex',
-                    gap: 'clamp(1.5rem, 3vw, 2.5rem)',
+                    gap: isMobile ? '1rem' : 'clamp(1.5rem, 3vw, 2.5rem)',
                     justifyContent: 'center',
                     alignItems: 'center',
                     flexWrap: 'wrap',
-                    padding: '2rem',
-                    zIndex: 10
+                    padding: isMobile ? '1rem' : '2rem',
+                    marginTop: isMobile ? '2rem' : '3rem',
+                    maxWidth: isMobile ? '100%' : '1200px',
+                    margin: '0 auto',
+                    zIndex: 5
                 }}
             >
                 {SYMBOLS.map((item, index) => {
@@ -658,9 +677,9 @@ export default function HubInteractiveSpace() {
                                     boxShadow: isCompleted
                                         ? '4px 4px 0px #ff4d7a, 0 10px 30px rgba(255, 77, 122, 0.3)'
                                         : '3px 3px 0px rgba(255, 255, 255, 0.7), 0 10px 30px rgba(255, 255, 255, 0.2)',
-                                    padding: '25px 20px',
-                                    width: '170px',
-                                    height: '210px',
+                                    padding: isMobile ? '12px 8px' : '25px 20px',
+                                    width: isMobile ? '100px' : '170px',
+                                    height: isMobile ? '140px' : '210px',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     alignItems: 'center',
@@ -711,7 +730,7 @@ export default function HubInteractiveSpace() {
                                         ease: 'easeInOut'
                                     }}
                                     style={{
-                                        fontSize: '5rem',
+                                        fontSize: isMobile ? '2.8rem' : '5rem',
                                         filter: isCompleted
                                             ? 'drop-shadow(3px 3px 0px rgba(255, 77, 122, 0.3))'
                                             : 'drop-shadow(2px 2px 0px rgba(255, 255, 255, 0.3))'
@@ -749,15 +768,15 @@ export default function HubInteractiveSpace() {
 
             {/* Progress with hearts */}
             <div style={{
-                position: 'absolute',
-                bottom: '5%',
-                left: '50%',
-                transform: 'translateX(-50%)',
+                position: 'relative',
+                marginTop: isMobile ? '2rem' : '3rem',
+                marginBottom: isMobile ? '2rem' : '3rem',
                 fontSize: '1rem',
                 letterSpacing: '0.1em',
                 zIndex: 10,
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '0.5rem'
             }}>
                 {allCompleted ? (
@@ -836,7 +855,7 @@ export default function HubInteractiveSpace() {
                     boxShadow: '0 4px 15px rgba(255, 77, 122, 0.4)',
                     textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
                     backdropFilter: 'blur(10px)',
-                    display: 'flex',
+                    display: isMobile ? 'none' : 'flex',
                     alignItems: 'center',
                     gap: '8px'
                 }}

@@ -28,6 +28,46 @@ const SONGS = [
         duration: "4:55",
         file: "/31-35_Gc_Ed_Sheeran_-_Let_Her_Go_RASK_L_V_-_a_(mp3.pm).mp3",
         mood: "sweet"
+    },
+    {
+        id: 4,
+        title: "As It Was",
+        artist: "Harry Styles",
+        duration: "2:47",
+        file: "/Harry Styles - As It Was.mp3",
+        mood: "upbeat"
+    },
+    {
+        id: 5,
+        title: "Birds of a Feather",
+        artist: "Billie Eilish",
+        duration: "3:30",
+        file: "/Billie_Eilish_-_Birds_of_feather_(mp3.pm).mp3",
+        mood: "dreamy"
+    },
+    {
+        id: 6,
+        title: "A Thousand Years",
+        artist: "Christina Perri",
+        duration: "4:45",
+        file: "/Christina_Perri_-_Thousand_years_(mp3.pm).mp3",
+        mood: "romantic"
+    },
+    {
+        id: 7,
+        title: "All of Me",
+        artist: "John Legend",
+        duration: "4:29",
+        file: "/Jhon_Legend_-_All_of_me_(SkySound.cc).mp3",
+        mood: "passionate"
+    },
+    {
+        id: 8,
+        title: "Golden Brown",
+        artist: "The Stranglers",
+        duration: "3:32",
+        file: "/The_Stranglers_by_Jesusavgn_-_Golden_Brown_(mp3.pm).mp3",
+        mood: "nostalgic"
     }
 ]
 
@@ -50,9 +90,19 @@ export default function MusicPlayerScreen() {
     const [customSongs, setCustomSongs] = useState([])
     const fileInputRef = useRef(null)
     const audioRef = useRef(null)
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
     // Combine default songs with custom songs
     const allSongs = [...SONGS, ...customSongs]
+
+    // Handle window resize for responsive design
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768)
+        }
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
 
     // Mark as completed when user enters
     useEffect(() => {
@@ -149,10 +199,12 @@ export default function MusicPlayerScreen() {
     return (
         <div style={{
             minHeight: '100vh',
-            background: 'linear-gradient(135deg, #ff6b9d 0%, #ffa6c1 50%, #ffb6d9 100%)',
+            background: 'linear-gradient(135deg, #ffcce6 0%, #ffd6e8 25%, #ffe6f0 50%, #fff0f5 75%, #ffcce6 100%)',
+            backgroundSize: '400% 400%',
+            animation: 'gradientShift 15s ease infinite',
             position: 'relative',
-            overflow: 'hidden',
-            padding: '2rem'
+            overflow: 'auto',
+            padding: isMobile ? '1rem' : '2rem'
         }}>
             {/* Floating particles */}
             {[...Array(20)].map((_, i) => (
@@ -187,14 +239,14 @@ export default function MusicPlayerScreen() {
                 onClick={() => navigate('/hub')}
                 style={{
                     position: 'fixed',
-                    top: '2rem',
-                    left: '2rem',
+                    top: isMobile ? '1rem' : '2rem',
+                    left: isMobile ? '1rem' : '2rem',
                     background: 'rgba(255, 255, 255, 0.9)',
                     border: '3px solid #ff6b9d',
                     borderRadius: '50px',
-                    padding: '12px 25px',
+                    padding: isMobile ? '8px 16px' : '12px 25px',
                     fontFamily: "'Pacifico', cursive",
-                    fontSize: '1rem',
+                    fontSize: isMobile ? '0.85rem' : '1rem',
                     color: '#ff6b9d',
                     cursor: 'pointer',
                     boxShadow: '4px 4px 0px #c41e5a',
@@ -210,8 +262,8 @@ export default function MusicPlayerScreen() {
                 margin: '0 auto',
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                gap: '2rem',
-                marginTop: '5rem'
+                gap: isMobile ? '1.5rem' : '2rem',
+                marginTop: isMobile ? '2rem' : '5rem'
             }}>
                 {/* Left section - Retro Player & Vinyl */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -223,7 +275,7 @@ export default function MusicPlayerScreen() {
                         style={{
                             background: 'linear-gradient(135deg, #fff4e6 0%, #ffe6f0 100%)',
                             borderRadius: '30px',
-                            padding: '2rem',
+                            padding: isMobile ? '1rem' : '2rem',
                             boxShadow: '0 20px 60px rgba(196, 30, 90, 0.4), inset 0 2px 10px rgba(255, 255, 255, 0.5)',
                             border: '4px solid #ff6b9d',
                             position: 'relative'
@@ -492,7 +544,7 @@ export default function MusicPlayerScreen() {
                         marginBottom: '2rem',
                         textShadow: '3px 3px 0px #c41e5a'
                     }}>
-                        Our Playlist 🎵
+                        Music, that associates with you 🎵
                     </h2>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
